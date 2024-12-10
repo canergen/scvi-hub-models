@@ -14,26 +14,6 @@ from scvi.criticism import create_criticism_report
 from scvi.hub import HubMetadata, HubModel, HubModelCardHelper
 from scvi.model.base import BaseModelClass
 
-import subprocess, os
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
-
-
-def upload_gdrive(path):
-    remote_url = subprocess.check_output(["dvc", "remote", "list"], text=True).split()[-1]
-
-    # Extract the Google Drive folder ID from the remote URL
-    folder_id = remote_url.split("gdrive://")[-1]
-
-    # Check if DVC detected an update
-    if "modified" in subprocess.check_output(["dvc", "diff", "--json"], text=True):
-        GoogleAuth().LocalWebserverAuth()
-        drive = GoogleDrive(GoogleAuth())
-        file = drive.CreateFile({"title": os.path.basename(path), "parents": [{"id": folder_id}]})
-        file.SetContentFile(path)
-        file.Upload()
-        print(f"Uploaded {path} to Google Drive folder {folder_id}.")
-
 # Specify your repository and target file
 repo_path = "."
 dvc_repo = Repo(repo_path)
@@ -127,7 +107,6 @@ class BaseModelWorkflow:
             print(f"Pushing {path_file} to DVC remote...")
             dvc_repo.push()
             git_repo.remote().push()
-            upload_gdrive(path_file)
         else:
             path_file = os.path.join('data/', self.config['extra_data_kwargs']['large_training_file_name'])
             dvc_repo.pull([path_file])

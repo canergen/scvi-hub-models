@@ -8,7 +8,7 @@ buck-out/
 __pycache__/
 .mypy_cache/
 .ruff_cache/
-/tabula_sapiens_partial/
+test/
 
 # Distribution / packaging
 /build/
